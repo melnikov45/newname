@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Расписание</title>
+    <link rel="stylesheet" href="..\css\style_schelude.css" />
+    <script src="..\js\script_schedule.js" defer></script>
+    <!--<script src="..\libs\rain.js" defer></script>-->
+    <!-- Unicons -->
+
+  </head>
+  <body>
+    <!-- Header -->
+    <section class="layers">
+      <div class="layers__container">
+        <div class="layers__item layer-1" style="background-image: url(../img/layer-1.jpg);"></div>
+			  <div class="layers__item layer-2" style="background-image: url(../img/layer-2.png);"></div>
+        <div class="layers__item layer-3">
+          <div class="hero-content">
+              <a href="../admin.html" class="nav_link">Администратор</a>                           
+              <a href="#" class="nav_link_2">Наряды</a>
+              <a href="#" class="nav_link_2">ПМК</a>
+              <a href="#" class="nav_link_2">История кафедры</a>
+            </div>
+
+              <div class="date-picker">
+                <label for="date-picker" class = "label-calendar">Выбор месяца:</label>
+                <select id="monthSelect"></select>
+                <select id="yearSelect"></select>
+                <div id="selectedDate"></div>
+                <button class="button" type = button id = "link-button"  >Сформировать расписание </button>
+              </div>
+
+            <div class="checkbox">
+              <input type="checkbox" class="my-checkbox" id = "checkbox" value="1"/>
+              <label for = "checkbox" >Показать всех</label>
+              </div>
+            <div class="checkbox_1">
+              <input type="checkbox" class="my-checkbox_1" id = "checkbox_2" value="2"/>
+              <label for = "checkbox_2" >ПMK 1</label>
+              <input type="checkbox" class="my-checkbox_1" id = "checkbox_3" value="3"/>
+              <label for = "checkbox_3" >ПMK 2</label>
+              </div>
+            <div class="checkbox_2_1">
+              <input type="checkbox" class="my-checkbox_2" id = "my_checkbox_2_1" value = "4"/>
+              <label for = "my_checkbox_2_1" >Пользователь 1</label>
+            </div>
+            <div class="checkbox_2_2">  
+              <input type="checkbox" class="my-checkbox_2" id = "my_checkbox_2_2" value="5"/>
+              <label for = "my_checkbox_2_2" >Пользователь 2</label>
+              </div>
+            <div class="checkbox_2_3"> 
+              <input type="checkbox" class="my-checkbox_2" id = "my_checkbox_2_3" value="6"/>
+              <label for = "my_checkbox_2_3" >Пользователь 3</label>
+              </div>
+            <div class="checkbox_2_4">   
+              <input type="checkbox" class="my-checkbox_2" id = "my_checkbox_2_4" value="7"/>
+              <label for = "my_checkbox_2_4" >Пользователь 4</label>
+              </div>  
+            <div class="checkbox_2_5">   
+              <input type="checkbox" class="my-checkbox_2" id = "my_checkbox_2_5" value="8"/>
+              <label for = "my_checkbox_2_5" >Пользователь 5</label>
+              </div>
+            <div class="checkbox_3_1">
+              <input type="checkbox" class="my-checkbox_3" id = "my_checkbox_3_1" value = "4"/>
+              <label for = "my_checkbox_3_1" >Пользователь 11</label>
+              </div>
+            <div class="checkbox_3_2">  
+              <input type="checkbox" class="my-checkbox_3" id = "my_checkbox_3_2" value="5"/>
+              <label for = "my_checkbox_3_2" >Пользователь 22</label>
+              </div>
+            <div class="checkbox_3_3"> 
+              <input type="checkbox" class="my-checkbox_3" id = "my_checkbox_3_3" value="6"/>
+              <label for = "my_checkbox_3_3" >Пользователь 33</label>
+              </div>
+            <div class="checkbox_3_4">   
+              <input type="checkbox" class="my-checkbox_3" id = "my_checkbox_3_4" value="7"/>
+              <label for = "my_checkbox_3_4" >Пользователь 44</label>
+              </div>  
+            <div class="checkbox_3_5">   
+              <input type="checkbox" class="my-checkbox_3" id = "my_checkbox_3_5" value="8"/>
+              <label for = "my_checkbox_3_5" >Пользователь 55</label>
+              </div> 
+              <style>
+                .weekend {
+                    background-color: #fd3b3b; /* Цвет для выходных (суббота и воскресенье) */
+                }
+            </style>
+            
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="close">&times;</span>
+                        <h2>Расписание</h2>
+                    </div>
+                    <div class="modal-body">
+                        <p>" "</p>
+                        <table id="data-table">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">Звание, фамилия</th>
+                                    <th rowspan="2">Часы занятий</th>
+                                    <th colspan="7">1</th>
+                                    <th colspan="8">2</th>
+                                    <th colspan="9">3</th>
+                                    <th colspan="10">4</th>
+                                </tr>
+                                <tr id="day-headers"></tr>
+                            </thead>
+                            <tbody id="table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <script>
+                // Получаем текущую дату
+                const currentDate = new Date();
+                const currentMonth = currentDate.getMonth(); // Месяц (0-11)
+                const currentYear = currentDate.getFullYear(); // Год
+            
+                // Функция для получения количества дней в месяце
+                function getDaysInMonth(month, year) {
+                    return new Date(year, month + 1, 0).getDate();
+                }
+            
+                // Получаем количество дней в текущем месяце
+                const daysInMonth = getDaysInMonth(currentMonth, currentYear);
+            
+                // Обновляем заголовки дней
+                const dayHeadersRow = document.getElementById('day-headers');
+                dayHeadersRow.innerHTML = ''; // Очищаем предыдущие заголовки
+            
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const th = document.createElement('th');
+                    th.textContent = day;
+                    dayHeadersRow.appendChild(th);
+                }
+            
+                // Пример данных пользователей
+                const users = [
+                    { name: "Пользователь 1", hours: ["1 - 2", "3 - 4", "5 - 6", "7 - 8"], subjects: [["ТАД1", "АСУ2", "АСУ3", "АСУ4", "АСУ5", "АСУ6", "АСУ7"], ["", "", "АСУ8", "АСУ9", "АСУ10", "АСУ11", "АСУ12"], ["", "", "АСУ13", "АСУ14", "АСУ15", "АСУ16", "АСУ17"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"]] },
+                    { name: "Пользователь 2", hours: ["1 - 2", "3 - 4", "5 - 6", "7 - 8"], subjects: [["АСУ1", "АСУ2", "АСУ3", "АСУ4", "АСУ5", "АСУ6", "АСУ7"], ["", "", "АСУ8", "АСУ9", "АСУ10", "АСУ11", "АСУ12"], ["", "", "АСУ13", "АСУ14", "АСУ15", "АСУ16", "АСУ17"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"]] },
+                    { name: "Пользователь 3", hours: ["1 - 2", "3 - 4", "5 - 6", "7 - 8"], subjects: [["АСУ1", "АСУ2", "АСУ3", "АСУ4", "АСУ5", "АСУ6", "АСУ7"], ["", "", "АСУ8", "АСУ9", "АСУ10", "АСУ11", "АСУ12"], ["", "", "АСУ13", "АСУ14", "АСУ15", "АСУ16", "АСУ17"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"]] },
+                    { name: "Пользователь 4", hours: ["1 - 2", "3 - 4", "5 - 6", "7 - 8"], subjects: [["АСУ1", "АСУ2", "АСУ3", "АСУ4", "АСУ5", "АСУ6", "АСУ7"], ["", "", "АСУ8", "АСУ9", "АСУ10", "АСУ11", "АСУ12"], ["", "", "АСУ13", "АСУ14", "АСУ15", "АСУ16", "АСУ17"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"]] },
+                    { name: "Пользователь 5", hours: ["1 - 2", "3 - 4", "5 - 6", "7 - 8"], subjects: [["АСУ1", "АСУ2", "АСУ3", "АСУ4", "АСУ5", "АСУ6", "АСУ7"], ["", "", "АСУ8", "АСУ9", "АСУ10", "АСУ11", "АСУ12"], ["", "", "АСУ13", "АСУ14", "АСУ15", "АСУ16", "АСУ17"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"]] }
+    ];
+
+    const tableBody = document.getElementById('table-body');
+
+    // Генерация строк таблицы для каждого пользователя
+    users.forEach(user => {
+        user.hours.forEach((hour, index) => {
+            const row = document.createElement('tr');
+            if (index === 0) {
+                const nameCell = document.createElement('td');
+                nameCell.rowSpan = 4; // Объединяем ячейку для имени пользователя
+                nameCell.textContent = user.name;
+                row.appendChild(nameCell);
+            }
+            const hourCell = document.createElement('td');
+            hourCell.textContent = hour;
+            row.appendChild(hourCell);
+
+            // Добавляем предметы в ячейки
+            user.subjects[index].forEach((subject, dayIndex) => {
+                const subjectCell = document.createElement('td');
+                subjectCell.textContent = subject || ""; // Если предмета нет, оставляем пустую ячейку
+
+                // Определяем, является ли день выходным
+                const dayOfMonth = (index * 7) + (dayIndex + 1); // Примерный расчет дня месяца
+                const date = new Date(currentYear, currentMonth, dayOfMonth);
+                const dayOfWeek = date.getDay(); // 0 - воскресенье, 6 - суббота
+
+                // Если день - суббота или воскресенье, добавляем класс
+                if (dayOfWeek === 0 || dayOfWeek === 6) {
+                    subjectCell.classList.add('weekend');
+                }
+
+                row.appendChild(subjectCell);
+            });
+
+            tableBody.appendChild(row);
+        });
+    });
+</script>
+        <div id="myModal2" class="modal2">
+          <div class="modal-content2">
+            <div class="modal-header2">
+              <span class="close2">&times;</span>
+              <h2 style="text-align: center;">Внести изменения</h2>
+              </div>
+              <!--<form autocomplete="off" action="../action_page.php">
+                <div class="autocomplete">
+                  <input id="myInput" class = "myInput" type ="text" name="myCountry" placeholder="Страна">
+                  <input type="submit">
+                </div>
+              </form>-->
+              <div class="select_choice">
+              <form>
+                <label for = "country">Введите название дисциплины:</label>
+                <select id="name-select" name="country">
+                  <option value="Костров">Программирование(ДС - 1203)</option>
+                  <option value="Аксёнов">Базы данных(ДС - 1201)</option>
+                  <option value="Скрыпник">Алгоритмизация(ДС - 1205)</option>
+                </select>
+              </form>
+              <form>
+                <label for = "country">Введите номер кабинета:</label>
+                <select id="age-select" name="country">
+                  <option value="5к416">5к416</option>
+                  <option value="5к417">5к417</option>
+                  <option value="1к160">1к160</option>
+                </select>
+              </form>
+              <form>
+                <label for = "country">Введите тип занятия:</label>
+                <select id="city-select" name="country">
+                  <option value="au">Л</option>
+                  <option value="ca">Пз</option>
+                  <option value="usa">Лр</option>
+                </select>
+              </form>
+              <form>
+                <label for = "country">Введите название учебной группы:</label>
+                <select id="country" name="country">
+                  <option value="au">1512</option>
+                  <option value="ca">1612</option>
+                  <option value="usa">1712</option>
+                </select>
+              </form>
+              <input id = "submit-button" type="submit" value = "Подтвердить">
+            </div>
+      </div>
+    </div>
+  </div>
+    </section>
+  </body>
+</html>
+    

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Расписание</title>
+    <style>
+        .date-picker {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .date-picker select {
+            margin: 0 5px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+        }
+        .weekend {
+            background-color: #fd3b3b; /* Цвет для выходных (суббота и воскресенье) */
+        }
+    </style>
+</head>
+<body>
+    <h2>Выберите месяц и год для формирования расписания</h2>
+    <div class="date-picker">
+        <select id="month"></select>
+        <select id="year"></select>
+        <button class="button" id="link-button">Сформировать расписание</button>
+    </div>
+    <p id="selected-date"></p>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2>Расписание</h2>
+            </div>
+            <div class="modal-body">
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">Звание, фамилия</th>
+                            <th rowspan="2">Часы занятий</th>
+                            <th colspan="31">Дни месяца</th>
+                        </tr>
+                        <tr id="day-headers"></tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Заполнение выпадающих списков
+        const monthSelect = document.getElementById('month');
+        const yearSelect = document.getElementById('year');
+
+        // Заполнение месяцев
+        const months = [
+            "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+            "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+        ];
+        for (let i = 0; i < months.length; i++) {
+            const option = document.createElement('option');
+            option.value = i + 1; // Месяцы от 1 до 12
+            option.textContent = months[i];
+            monthSelect.appendChild(option);
+        }
+
+        // Заполнение годов начиная с 2020
+        const currentYear = new Date().getFullYear();
+        for (let i = 2020; i <= currentYear; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            yearSelect.appendChild(option);
+        }
+
+        // Обработчик события для кнопки "Сформировать расписание"
+        document.getElementById('link-button').addEventListener('click', function() {
+            const selectedMonth = parseInt(monthSelect.value) - 1; // Месяцы от 0 до 11
+            const selectedYear = parseInt(yearSelect.value);
+
+            // Получаем количество дней в выбранном месяце
+            const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+
+            // Обновляем заголовки дней
+            const dayHeadersRow = document.getElementById('day-headers');
+            dayHeadersRow.innerHTML = ''; // Очищаем предыдущие заголовки
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const th = document.createElement('th');
+                th.textContent = day;
+                dayHeadersRow.appendChild(th);
+            }
+
+            // Очищаем тело таблицы
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = ''; // Очищаем предыдущие строки
+
+            // Пример данных пользователей
+            const users = [
+                { name: "Пользователь 1", hours: ["1 - 2", "3 - 4", "5 - 6", "7 - 8"], subjects: [["ТАД1", "АСУ2", "АСУ3", "АСУ4", "АСУ5", "АСУ6", "АСУ7"], ["", "", "АСУ8", "АСУ9", "АСУ10", "АСУ11", "АСУ12"], ["", "", "АСУ13", "АСУ14", "АСУ15", "АСУ16", "АСУ17"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"]] },
+                { name: "Пользователь 2", hours: ["1 - 2", "3 - 4", "5 - 6", "7 - 8"], subjects: [["АСУ1", "АСУ2", "АСУ3", "АСУ4", "АСУ5", "АСУ6", "АСУ7"], ["", "", "АСУ8", "АСУ9", "АСУ10", "АСУ11", "АСУ12"], ["", "", "АСУ13", "АСУ14", "АСУ15", "АСУ16", "АСУ17"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"]] },
+                { name: "Пользователь 3", hours: ["1 - 2", "3 - 4", "5 - 6", "7 - 8"], subjects: [["АСУ1", "АСУ2", "АСУ3", "АСУ4", "АСУ5", "АСУ6", "АСУ7"], ["", "", "АСУ8", "АСУ9", "АСУ10", "АСУ11", "АСУ12"], ["", "", "АСУ13", "АСУ14", "АСУ15", "АСУ16", "АСУ17"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"]] },
+                { name: "Пользователь 4", hours: ["1 - 2", "3 - 4", "5 - 6", "7 - 8"], subjects: [["АСУ1", "АСУ2", "АСУ3", "АСУ4", "АСУ5", "АСУ6", "АСУ7"], ["", "", "АСУ8", "АСУ9", "АСУ10", "АСУ11", "АСУ12"], ["", "", "АСУ13", "АСУ14", "АСУ15", "АСУ16", "АСУ17"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"]] },
+                { name: "Пользователь 5", hours: ["1 - 2", "3 - 4", "5 - 6", "7 - 8"], subjects: [["АСУ1", "АСУ2", "АСУ3", "АСУ4", "АСУ5", "АСУ6", "АСУ7"], ["", "", "АСУ8", "АСУ9", "АСУ10", "АСУ11", "АСУ12"], ["", "", "АСУ13", "АСУ14", "АСУ15", "АСУ16", "АСУ17"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"], ["", "", "АСУ18", "АСУ19", "АСУ20", "АСУ21", "АСУ22"]] }
+            ];
+
+            // Генерация строк таблицы для каждого пользователя
+            users.forEach(user => {
+                user.hours.forEach((hour, index) => {
+                    const row = document.createElement('tr');
+                    if (index === 0) {
+                        const nameCell = document.createElement('td');
+                        nameCell.rowSpan = user.hours.length; // Объединяем ячейку для имени пользователя 
+                        nameCell.textContent = user.name;
+                        row.appendChild(nameCell);
+                    }
+                    const hourCell = document.createElement('td');
+                    hourCell.textContent = hour;
+                    row.appendChild(hourCell);
+
+                    // Добавляем предметы в ячейки
+                    user.subjects[index].forEach((subject, dayIndex) => {
+                        const subjectCell = document.createElement('td');
+                        subjectCell.textContent = subject || ""; // Если предмета нет, оставляем пустую ячейку
+
+                        // Определяем, является ли день выходным
+                        const dayOfMonth = dayIndex + 1; // День месяца
+                        const date = new Date(selectedYear, selectedMonth, dayOfMonth);
+                        const dayOfWeek = date.getDay(); // 0 - воскресенье, 6 - суббота
+
+                        // Если день - суббота или воскресенье, добавляем класс
+                        if (dayOfWeek === 0 || dayOfWeek === 6) {
+                            subjectCell.classList.add('weekend');
+                        }
+
+                        row.appendChild(subjectCell);
+                    });
+
+                    tableBody.appendChild(row);
+                });
+            });
+
+            // Обновляем выбранную дату
+            document.getElementById('selected-date').innerText = 'Выбранный месяц: ' + months[selectedMonth] + ' ' + selectedYear;
+        });
+    </script>
+</body>
+</html>
